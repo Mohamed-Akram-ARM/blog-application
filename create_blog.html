@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Blog | BlogHub</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="js/js.js"></script>
+</head>
+
+<body>
+
+    <header>
+
+        <div class="logo">
+
+            <i class="fa-solid fa-book-open"></i>
+
+            BlogHub
+
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="index.html">Home</a></li>
+
+                <li><a href="dashboard.html">Dashboard</a></li>
+
+                <li><a href="create-blog.html" class="active">Create Blog</a></li>
+
+                <li><a href="login.html">Logout</a></li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+    <section class="form-container">
+
+        <div class="form-box blog-form">
+
+            <h2>Create New Blog</h2>
+
+            <form>
+
+                <div class="input-group">
+
+                    <label>Blog Title</label>
+
+                    <input type="text" placeholder="Enter blog title" required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Category</label>
+
+                    <select>
+
+                        <option>Technology</option>
+
+                        <option>Programming</option>
+
+                        <option>Education</option>
+
+                        <option>Lifestyle</option>
+
+                        <option>Travel</option>
+
+                    </select>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Blog Image URL</label>
+
+                    <input type="text" placeholder="Paste image URL">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Content</label>
+
+                    <textarea rows="8" placeholder="Write your blog..." required></textarea>
+
+                </div>
+
+                <button class="btn" type="submit">
+
+                    Publish Blog
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <footer>
+
+        <p> BlogHub</p>
+
+    </footer>
+
+</body>
+
+</html>
