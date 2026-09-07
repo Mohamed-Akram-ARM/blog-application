@@ -54,56 +54,54 @@
 
             <h2>Create New Blog</h2>
 
-            <form>
+            <form id="createBlogForm">
 
                 <div class="input-group">
 
                     <label>Blog Title</label>
 
-                    <input type="text" placeholder="Enter blog title" required>
+                    <input type="text" id="title" placeholder="Enter blog title" required>
 
                 </div>
+
 
                 <div class="input-group">
 
                     <label>Category</label>
 
-                    <select>
+                    <select id="category" required>
 
-                        <option>Technology</option>
-
-                        <option>Programming</option>
-
-                        <option>Education</option>
-
-                        <option>Lifestyle</option>
-
-                        <option>Travel</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Programming">Programming</option>
+                        <option value="Education">Education</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                        <option value="Travel">Travel</option>
 
                     </select>
 
                 </div>
 
+
                 <div class="input-group">
 
                     <label>Blog Image URL</label>
 
-                    <input type="text" placeholder="Paste image URL">
+                    <input type="text" id="image" placeholder="Paste image URL">
 
                 </div>
+
 
                 <div class="input-group">
 
                     <label>Content</label>
 
-                    <textarea rows="8" placeholder="Write your blog..." required></textarea>
+                    <textarea id="content" rows="8" placeholder="Write your blog..." required></textarea>
 
                 </div>
 
+
                 <button class="btn" type="submit">
-
                     Publish Blog
-
                 </button>
 
             </form>

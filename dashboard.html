@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,28 +14,50 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <script src="js/js.js"></script>
+
+    <!-- Important: defer -->
+    <script src="js/.js" defer></script>
+
 </head>
 
 <body>
 
+    <!-- HEADER -->
+
     <header>
 
         <div class="logo">
-            <i class="fa-solid fa-book-open"></i> BlogHub
+            <i class="fa-solid fa-book-open"></i>
+            BlogHub
         </div>
 
         <nav>
 
             <ul>
 
-                <li><a href="index.html">Home</a></li>
+                <li>
+                    <a href="index.html">
+                        Home
+                    </a>
+                </li>
 
-                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li>
+                    <a href="dashboard.html" class="active">
+                        Dashboard
+                    </a>
+                </li>
 
-                <li><a href="create-blog.html">Create Blog</a></li>
+                <li>
+                    <a href="create_blog.html">
+                        Create Blog
+                    </a>
+                </li>
 
-                <li><a href="login.html">Logout</a></li>
+                <li>
+                    <a href="#" id="logoutBtn">
+                        Logout
+                    </a>
+                </li>
 
             </ul>
 
@@ -42,13 +65,27 @@
 
     </header>
 
+
+    <!-- DASHBOARD -->
+
     <section class="dashboard">
 
         <div class="dashboard-header">
 
-            <h1>Welcome Back 👋</h1>
+            <div>
 
-            <a href="create-blog.html" class="btn">
+                <h1>
+                    Welcome Back 👋
+                </h1>
+
+                <p>
+                    Manage your blogs from here.
+                </p>
+
+            </div>
+
+
+            <a href="create_blog.html" class="btn">
 
                 <i class="fa-solid fa-plus"></i>
 
@@ -58,107 +95,30 @@
 
         </div>
 
-        <div class="blog-grid">
 
-            <div class="blog-card">
+        <!-- BLOGS WILL BE LOADED HERE -->
 
-                <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600">
+        <div class="blog-grid" id="blogList">
 
-                <div class="content">
-
-                    <h3>Learning HTML</h3>
-
-                    <p>
-                        HTML is the foundation of every website.
-                    </p>
-
-                    <div class="blog-actions">
-
-                        <button class="edit-btn">
-                            <i class="fa-solid fa-pen"></i>
-                            Edit
-                        </button>
-
-                        <button class="delete-btn">
-                            <i class="fa-solid fa-trash"></i>
-                            Delete
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="blog-card">
-
-                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600">
-
-                <div class="content">
-
-                    <h3>CSS Tricks</h3>
-
-                    <p>
-                        Build beautiful responsive layouts.
-                    </p>
-
-                    <div class="blog-actions">
-
-                        <button class="edit-btn">
-                            <i class="fa-solid fa-pen"></i>
-                            Edit
-                        </button>
-
-                        <button class="delete-btn">
-                            <i class="fa-solid fa-trash"></i>
-                            Delete
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="blog-card">
-
-                <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600">
-
-                <div class="content">
-
-                    <h3>JavaScript Basics</h3>
-
-                    <p>
-                        Learn DOM manipulation and events.
-                    </p>
-
-                    <div class="blog-actions">
-
-                        <button class="edit-btn">
-                            <i class="fa-solid fa-pen"></i>
-                            Edit
-                        </button>
-
-                        <button class="delete-btn">
-                            <i class="fa-solid fa-trash"></i>
-                            Delete
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
+            <p>
+                Loading blogs...
+            </p>
 
         </div>
 
     </section>
 
+
+    <!-- FOOTER -->
+
     <footer>
 
-        <p> 2026 BlogHub</p>
+        <p>
+            © 2026 BlogHub
+        </p>
 
     </footer>
+
 
 </body>
 

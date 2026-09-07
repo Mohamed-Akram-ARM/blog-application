@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Akram",
+    "email": "akram@gmail.com",
+    "password": "123456"
+  },
+  {
+    "id": 2,
+    "name": "askram",
+    "email": "askram@gmail.com",
+    "password": "654321"
+  },
+  {
+    "id": 3,
+    "name": "Mohamed",
+    "email": "mohemmed@gmail.com",
+    "password": "14789"
+  },
+  {
+    "id": 4,
+    "name": "cd",
+    "email": "moh@gmail.com",
+    "password": "454545"
+  },
+  {
+    "id": 5,
+    "name": "f",
+    "email": "mm@gmail.com",
+    "password": "787878"
+  },
+  {
+    "id": 6,
+    "name": "kanesh",
+    "email": "kanesh@gmail.com",
+    "password": "kanesh1234"
+  },
+  {
+    "id": 7,
+    "name": "fd",
+    "email": "fd@gmail.com",
+    "password": "fd"
+  },
+  {
+    "id": 8,
+    "name": "ee",
+    "email": "ee@gmail.com",
+    "password": "ee"
+  }
+]
