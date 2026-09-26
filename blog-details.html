@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Blog Details | BlogHub</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="create-blog.html">Create Blog</a>
+        </nav>
+    </header>
+
+    <main class="blog-details-container">
+
+        <div id="blogDetails">
+            <p>Loading blog...</p>
+        </div>
+
+        <a href="index.html">← Back to Home</a>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+
+            const container = document.getElementById("blogDetails");
+
+            const params = new URLSearchParams(window.location.search);
+            const blogId = params.get("id");
+
+            if (!blogId) {
+                container.innerHTML = "<p>Blog ID is missing.</p>";
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `http://localhost:5000/api/blogs/${encodeURIComponent(blogId)}`
+                );
+
+                const blog = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(blog.message || "Blog not found");
+                }
+
+                container.innerHTML = `
+                    <article class="blog-detail">
+
+                        <h1>${blog.title}</h1>
+
+                        <p>
+                            <strong>Author:</strong>
+                            ${blog.author || "Unknown"}
+                        </p>
+
+                        <p>
+                            <strong>Category:</strong>
+                            ${blog.category || "General"}
+                        </p>
+
+                        <p>
+                            <strong>Published:</strong>
+                            ${blog.createdAt
+                        ? new Date(blog.createdAt).toLocaleDateString()
+                        : ""}
+                        </p>
+
+                        ${blog.image ? `
+                            <img
+                                src="${blog.image}"
+                                alt="${blog.title}"
+                                style="max-width:100%; height:auto;"
+                            >
+                        ` : ""}
+
+                        <div class="blog-full-content"
+                             style="white-space:pre-wrap;">
+                            ${blog.content}
+                        </div>
+
+                    </article>
+                `;
+
+                document.title = blog.title + " | BlogHub";
+
+            } catch (error) {
+                console.error("Blog details error:", error);
+
+                container.innerHTML =
+                    "<p>Unable to load this blog. Please try again.</p>";
+            }
+        });
+    </script>
+
+</body>
+
+</html>

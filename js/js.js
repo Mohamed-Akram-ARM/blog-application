@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ================================
     // Mobile Menu
     // ================================
-
+    loadLatestBlogs();
     const menuButton = document.querySelector(".menu-btn");
     const navMenu = document.querySelector(".nav-menu");
 
@@ -19,6 +19,65 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
+    async function loadLatestBlogs() {
+        const container = document.getElementById("latestBlogs");
+
+        if (!container) return;
+
+        try {
+            const response = await fetch(
+                "http://localhost:5000/api/blogs"
+            );
+
+            const blogs = await response.json();
+
+            if (!response.ok) {
+                throw new Error("Failed to load blogs");
+            }
+
+            if (blogs.length === 0) {
+                container.innerHTML =
+                    "<p>No blogs published yet.</p>";
+                return;
+            }
+
+            container.innerHTML = blogs.map(blog => `
+            <div class="blog-card">
+                <img
+                    src="${blog.image || 'https://placehold.co/600x300?text=Blog'}"
+                    alt="Blog image"
+                >
+
+                <h3>${blog.title}</h3>
+
+                <p>${blog.content}</p>
+
+                <p>
+                    <strong>By:</strong>
+                    ${blog.author || "Unknown"}
+                </p>
+
+               <button
+            onclick="viewBlog('${blog._id}')"
+            class="read-more-btn">
+            Read More
+        </button>
+        `).join("");
+
+
+        } catch (error) {
+            console.error("Latest blogs error:", error);
+
+            container.innerHTML =
+                "<p>Unable to load latest blogs.</p>";
+        }
+    }
+    // ADD THIS BELOW loadLatestBlogs()
+
+    function viewBlog(blogId) {
+        window.location.href = "blog-details.html?id=" + blogId;
+    }
     // ================================
     // Login Form
     // ================================
@@ -194,134 +253,69 @@ document.addEventListener("DOMContentLoaded", function () {
     // Create Blog Form
     // ================================
 
-    const createBlogForm =
-        document.getElementById("createBlogForm");
+    const createBlogForm = document.getElementById("createBlogForm");
 
     if (createBlogForm) {
+        createBlogForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-        createBlogForm.addEventListener(
-            "submit",
-            async function (e) {
+            const title = document.getElementById("blogTitle").value.trim();
+            const category = document.getElementById("blogCategory").value;
+            const image = document.getElementById("blogImage").value.trim();
+            const content = document.getElementById("blogContent").value.trim();
 
-                e.preventDefault();
+            const savedUser = localStorage.getItem("user");
 
-                const title =
-                    document.getElementById("title").value.trim();
-
-                const category =
-                    document.getElementById("category").value;
-
-                const image =
-                    document.getElementById("image").value.trim();
-
-                const content =
-                    document.getElementById("content").value.trim();
-
-
-                // Get logged-in user
-                const savedUser =
-                    localStorage.getItem("user");
-
-                if (!savedUser) {
-
-                    alert("Please login first.");
-
-                    window.location.href = "login.html";
-
-                    return;
-                }
-
-                const user = JSON.parse(savedUser);
-
-
-                if (!title || !content) {
-
-                    alert(
-                        "Please enter blog title and content."
-                    );
-
-                    return;
-                }
-
-
-                try {
-
-                    const response = await fetch(
-                        "http://localhost:5000/api/blogs",
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify({
-
-                                title: title,
-
-                                category: category,
-
-                                image: image,
-
-                                content: content,
-
-                                userId: user.id || user._id,
-
-                                author:
-                                    user.name ||
-                                    user.email ||
-                                    "Unknown",
-
-                                createdAt:
-                                    new Date().toISOString()
-
-                            })
-                        }
-                    );
-
-                    const data = await response.json();
-
-
-                    if (response.ok) {
-
-                        alert(
-                            "Blog published successfully!"
-                        );
-
-                        localStorage.removeItem("editBlog");
-
-                        createBlogForm.reset();
-
-                        window.location.href =
-                            "dashboard.html";
-
-                    } else {
-
-                        alert(
-                            data.message ||
-                            "Failed to publish blog."
-                        );
-
-                    }
-
-                } catch (error) {
-
-                    console.error(
-                        "Create blog error:",
-                        error
-                    );
-
-                    alert(
-                        "Cannot connect to backend server."
-                    );
-
-                }
-
+            if (!savedUser) {
+                alert("Please login first.");
+                window.location.href = "login.html";
+                return;
             }
-        );
 
+            const user = JSON.parse(savedUser);
+            const userId = user.id || user._id;
+
+            if (!userId) {
+                alert("User ID missing. Please login again.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:5000/api/blogs", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        title,
+                        category,
+                        image,
+                        content,
+                        userId,
+                        author: user.name || user.email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.message || "Failed to publish blog.");
+                    console.error(data);
+                    return;
+                }
+
+                alert("Blog published successfully!");
+
+                createBlogForm.reset();
+
+                window.location.href = "dashboard.html";
+
+            } catch (error) {
+                console.error("Publish error:", error);
+                alert("Cannot connect to backend. Check if server is running.");
+            }
+        });
     }
-
 
     // ================================
     // Dashboard - Load Blogs
@@ -340,8 +334,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
+            const savedUser = localStorage.getItem("user");
+
+            if (!savedUser) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const user = JSON.parse(savedUser);
+
+            const userId = user.id || user._id;
+
+            if (!userId) {
+                alert("User ID not found. Please login again.");
+                return;
+            }
+
             const response = await fetch(
-                "http://localhost:5000/api/blogs"
+                `http://localhost:5000/api/blogs?userId=${userId}`
             );
 
 
@@ -740,7 +750,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-
+function viewBlog(id) {
+    window.location.href =
+        `blog-details.html?id=${encodeURIComponent(id)}`;
+}
 // ================================
 // Email Validation Function
 // ================================
