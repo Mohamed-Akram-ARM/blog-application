@@ -188,7 +188,7 @@ app.post("/api/blogs", async (req, res) => {
 });
 
 // 1. GET ALL BLOGS — for index.html
-app.get("/api/blogs", async (req, res) => {
+/*app.get("/api/blogs", async (req, res) => {
     try {
         const blogs = await Blog.find()
             .sort({ createdAt: -1 });
@@ -201,28 +201,25 @@ app.get("/api/blogs", async (req, res) => {
             message: "Failed to load blogs"
         });
     }
-});
+});*/
 
 // 2. GET LOGGED-IN AUTHOR'S BLOGS — for dashboard.html
-app.get("/api/my-blogs", async (req, res) => {
+
+app.get("/api/blogs", async (req, res) => {
     try {
-        const { userId } = req.query;
+        const userId = req.query.userId;
 
-        if (!userId) {
-            return res.status(400).json({
-                message: "User ID is required"
-            });
-        }
+        const filter = userId ? { userId: userId } : {};
 
-        const blogs = await Blog.find({ userId })
-            .sort({ createdAt: -1 });
+        const blogs = await Blog.find(filter).sort({
+            createdAt: -1
+        });
 
-        res.status(200).json(blogs);
+        res.json(blogs);
     } catch (error) {
-        console.error("Get my blogs error:", error);
-
+        console.error(error);
         res.status(500).json({
-            message: "Failed to load your blogs"
+            message: "Failed to load blogs"
         });
     }
 });

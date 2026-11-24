@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mobile Menu
     // ================================
     loadLatestBlogs();
+    //loadDashboardBlogs();
     const menuButton = document.querySelector(".menu-btn");
     const navMenu = document.querySelector(".nav-menu");
 
@@ -82,170 +83,59 @@ document.addEventListener("DOMContentLoaded", function () {
     // Login Form
     // ================================
 
+    console.log("Login JavaScript loaded");
+
     const loginForm = document.getElementById("loginForm");
 
     if (loginForm) {
-
         loginForm.addEventListener("submit", async function (e) {
-
             e.preventDefault();
+            console.log("Login button clicked");
+            const loginForm = document.getElementById("loginForm");
 
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
+            if (loginForm) {
+                loginForm.addEventListener("submit", async function (e) {
+                    e.preventDefault();
 
-            if (!email || !password) {
-                alert("Please enter email and password.");
-                return;
-            }
+                    const email = document.getElementById("email").value.trim();
+                    const password = document.getElementById("password").value;
 
-            if (!validateEmail(email)) {
-                alert("Please enter a valid email address.");
-                return;
-            }
+                    try {
+                        const response = await fetch(
+                            "http://localhost:5000/api/login",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ email, password })
+                            }
+                        );
 
-            try {
+                        const data = await response.json();
 
-                const response = await fetch(
-                    "http://localhost:5000/api/login",
-                    {
-                        method: "POST",
+                        if (!response.ok) {
+                            alert(data.message || "Login failed");
+                            return;
+                        }
 
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        if (!data.user) {
+                            alert("Login succeeded, but the user data is missing from the server response.");
+                            console.error("Login response:", data);
+                            return;
+                        }
 
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        })
+                        localStorage.setItem("user", JSON.stringify(data.user));
+
+                        window.location.href = "dashboard.html";
+
+                    } catch (error) {
+                        console.error("Login error:", error);
+                        alert("Cannot connect to backend. Check that the server is running.");
                     }
-                );
-
-                const data = await response.json();
-
-                if (response.ok) {
-
-                    alert("Login successful!");
-
-                    localStorage.setItem(
-                        "user",
-                        JSON.stringify(data.user || data)
-                    );
-
-                    window.location.href = "dashboard.html";
-
-                } else {
-
-                    alert(data.message || "Login failed.");
-
-                }
-
-            } catch (error) {
-
-                console.error("Login error:", error);
-
-                alert("Cannot connect to backend server.");
-
+                });
             }
-
         });
-
-    }
-
-
-    // ================================
-    // Register Form
-    // ================================
-
-    const registerForm = document.getElementById("registerForm");
-
-    if (registerForm) {
-
-        registerForm.addEventListener("submit", async function (e) {
-
-            e.preventDefault();
-
-            const name = document.getElementById("name").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
-
-            // Check empty fields
-            if (!name || !email || !password) {
-
-                alert("Please fill all fields.");
-
-                return;
-            }
-
-            // Check email
-            if (!validateEmail(email)) {
-
-                alert("Please enter a valid email address.");
-
-                return;
-            }
-
-            try {
-
-                console.log("Sending registration data...");
-
-                const response = await fetch(
-                    "http://localhost:5000/api/register",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            name: name,
-                            email: email,
-                            password: password
-                        })
-                    }
-                );
-
-                const data = await response.json();
-
-                console.log("Register response:", data);
-
-                if (response.ok) {
-
-                    alert(
-                        data.message ||
-                        "Registration successful!"
-                    );
-
-                    registerForm.reset();
-
-                    window.location.href = "login.html";
-
-                } else {
-
-                    alert(
-                        data.message ||
-                        "Registration failed."
-                    );
-
-                }
-
-            } catch (error) {
-
-                console.error(
-                    "Registration error:",
-                    error
-                );
-
-                alert(
-                    "Cannot connect to backend server. " +
-                    "Make sure your server is running on port 5000."
-                );
-
-            }
-
-        });
-
     }
 
 
@@ -325,15 +215,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("blogList");
 
 
+    const blog = document.getElementById("blogList");
+
     async function loadBlogs() {
-
-        if (!blogList) {
-            return;
-        }
-
+        if (!blogList) return;
 
         try {
-
             const savedUser = localStorage.getItem("user");
 
             if (!savedUser) {
@@ -342,8 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const user = JSON.parse(savedUser);
-
-            const userId = user.id || user._id;
+            const userId = String(user._id || user.id || "");
 
             if (!userId) {
                 alert("User ID not found. Please login again.");
@@ -351,196 +237,87 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const response = await fetch(
-                `http://localhost:5000/api/blogs?userId=${userId}`
+                "http://localhost:5000/api/blogs"
             );
 
-
             if (!response.ok) {
-
-                throw new Error(
-                    "Failed to load blogs."
-                );
-
+                throw new Error("Failed to load blogs");
             }
 
+            const allBlogs = await response.json();
 
-            const blogs = await response.json();
+            // Filter blogs belonging to the logged-in author
+            const myBlogs = allBlogs.filter(blog => {
+                const blogUserId =
+                    typeof blog.userId === "object"
+                        ? blog.userId?._id
+                        : blog.userId;
 
+                return String(blogUserId || "") === userId;
+            });
 
-            if (!Array.isArray(blogs) ||
-                blogs.length === 0) {
-
+            if (myBlogs.length === 0) {
                 blogList.innerHTML = `
-
-                    <div class="no-blogs">
-
-                        <i class="fa-solid fa-newspaper"></i>
-
-                        <h2>No Blogs Yet</h2>
-
-                        <p>
-                            Create your first blog
-                            to get started.
-                        </p>
-
-                        <a
-                            href="create_blog.html"
-                            class="btn"
-                        >
-                            Create Blog
-                        </a>
-
-                    </div>
-
-                `;
-
+                <div class="no-blogs">
+                    <h2>No Blogs Yet</h2>
+                    <p>You haven't published any blogs yet.</p>
+                    <a href="create-blog.html" class="btn">
+                        Create Blog
+                    </a>
+                </div>
+            `;
                 return;
             }
 
+            blogList.innerHTML = myBlogs.map(blog => {
+                const blogId = blog._id || blog.id;
 
-            blogList.innerHTML = blogs.map(
-                function (blog) {
+                return `
+                <div class="blog-card">
+                    ${blog.image ? `
+                        <img src="${blog.image}" alt="${blog.title || "Blog"}">
+                    ` : ""}
 
-                    return `
+                    <div class="content">
+                        <span class="category">
+                            ${blog.category || "General"}
+                        </span>
 
-                    <div class="blog-card">
+                        <h3>${blog.title || "Untitled"}</h3>
+                        <p>${blog.content || ""}</p>
 
-                        ${blog.image
-                            ?
-                            `
-                            <img
-                                src="${blog.image}"
-                                alt="${blog.title}"
-                            >
-                            `
-                            :
-                            `
-                            <div class="no-image">
+                        <small>
+                            ${blog.createdAt
+                        ? new Date(blog.createdAt).toLocaleDateString()
+                        : "No date"}
+                        </small>
 
-                                <i class="fa-solid fa-image"></i>
+                        <div class="blog-actions">
+                            <button onclick="editBlog('${blogId}')">
+                                Edit
+                            </button>
 
-                            </div>
-                            `
-                        }
-
-
-                        <div class="content">
-
-                            <span class="category">
-
-                                ${blog.category || "General"}
-
-                            </span>
-
-
-                            <h3>
-
-                                ${blog.title || "Untitled"}
-
-                            </h3>
-
-
-                            <p>
-
-                                ${blog.content || ""}
-
-                            </p>
-
-
-                            <small>
-
-                                <i
-                                    class="fa-regular fa-calendar"
-                                ></i>
-
-                                ${blog.createdAt
-                            ?
-                            new Date(
-                                blog.createdAt
-                            ).toLocaleDateString()
-                            :
-                            "No date"
-                        }
-
-                            </small>
-
-
-                            <div class="blog-actions">
-
-                                <button
-                                    class="edit-btn"
-                                    onclick="editBlog('${blog.id}')"
-                                >
-
-                                    <i
-                                        class="fa-solid fa-pen"
-                                    ></i>
-
-                                    Edit
-
-                                </button>
-
-
-                                <button
-                                    class="delete-btn"
-                                    onclick="deleteBlog('${blog.id}')"
-                                >
-
-                                    <i
-                                        class="fa-solid fa-trash"
-                                    ></i>
-
-                                    Delete
-
-                                </button>
-
-                            </div>
-
+                            <button onclick="deleteBlog('${blogId}')">
+                                Delete
+                            </button>
                         </div>
-
                     </div>
-
-                    `;
-
-                }
-            ).join("");
-
+                </div>
+            `;
+            }).join("");
 
         } catch (error) {
-
-            console.error(
-                "Error loading blogs:",
-                error
-            );
-
+            console.error("Error loading blogs:", error);
 
             blogList.innerHTML = `
-
-                <div class="no-blogs">
-
-                    <i
-                        class="fa-solid fa-triangle-exclamation"
-                    ></i>
-
-                    <h2>
-                        Unable to Load Blogs
-                    </h2>
-
-                    <p>
-                        Please make sure the backend
-                        server is running.
-                    </p>
-
-                </div>
-
-            `;
-
+            <div class="no-blogs">
+                <h2>Unable to Load Blogs</h2>
+                <p>Please check your backend server.</p>
+            </div>
+        `;
         }
-
     }
 
-
-    // Load blogs
     loadBlogs();
 
 
